@@ -1,0 +1,21 @@
+{
+    "__categories__": [
+        {
+            "name": "bootstrap",
+            "prettyName": "Bootstrap"
+        }
+    ],
+    "__elements__": {
+        "bootstrap": {
+            "bootstrap-row-2cols": {
+                "filename": "bootstrap-row-2cols",
+                "name": "Row with 2 columns"
+            },
+            "bootstrap-row-3cols": {
+                "filename": "bootstrap-row-3cols",
+                "name": "Row with 3 columns"
+            }
+        }
+    }
+    
+}
