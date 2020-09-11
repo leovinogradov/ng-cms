@@ -169,11 +169,11 @@ def addRowWith2Cols(level=0, indentation='    '):
     return s
 
 
-def getIndentedCode(elementDescription, level=0, indentation='    '):
+def getIndentedCode(elementDescription, level=0, indentation='\t'):
     elementFilename = elementDescription['filename'];
     p = "./code/" + elementFilename
     file = open(p, 'r')
-    s = ""
+    s = "\n"
     indent = indentation * level
     for line in file.readlines():
         s += indent + line
@@ -187,13 +187,14 @@ def addElement(filepath, elementDescription, details):
 
     content_after, level = searchV2(content, details)
     position = len(content) - len(content_after)
+    print('Level =', level)
     print('=== BEFORE === ')
     print(content[:position])
     print('\n=== AFTER ===')
     print(content_after)
 
     result = content[:position]
-    result += getIndentedCode(elementDescription)
+    result += getIndentedCode(elementDescription, level)
     result += content_after
 
     # print("\n--- content after ---\n", result)
