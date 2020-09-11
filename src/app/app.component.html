@@ -9,7 +9,7 @@
   <div *ngFor="let category of availableCategories">
     <button mat-flat-button color="primary" [matMenuTriggerFor]="menu">Add {{ category.prettyName || category.name }} element</button>
     <mat-menu #menu="matMenu">
-      <a mat-menu-item *ngFor="let element of getElementsFromCategory(category.name)">
+      <a mat-menu-item *ngFor="let element of getElementsFromCategory(category.name)" (click)="addElement(element)">
         {{ element.name }}
       </a>
     </mat-menu>

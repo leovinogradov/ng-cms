@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   availableElements: any;
   availableCategories: Array<any>;
   // descriptivePath: Array<any>;
+  // elementToInsert: any;
 
   constructor(
     private http: HttpClient,
@@ -162,10 +163,22 @@ export class AppComponent implements OnInit {
     return descriptivePath;
   }
 
-  addElement1() {
+  // setElement(element) {
+  //   this.elementToInsert = element;
+  //   console.log('element to insert is', element);
+  // }
+
+  addElement(element) {
     console.log('Current target', this.currentTgt);
+    console.log('Element to insert', element);
+    if (!element || !element.filename) {
+      console.log('Error: No element to insert');
+      return;
+    }
+
     const ob = this.http.post('http://localhost:5000/insert', {
       path: '/views/hello/hello.component.html',
+      element: element,
       details: this.generateDescriptivePath()
     });
 

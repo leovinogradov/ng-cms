@@ -3,7 +3,7 @@ import re
 path_to_app = '../src/app';
 
 def read(p):
-    print("Path to read:", p)
+    print("Reading:", p)
     file = open(p, 'r')
     s = file.read()
     file.close()
@@ -169,15 +169,20 @@ def addRowWith2Cols(level=0, indentation='    '):
     return s
 
 
-
-def insertCode(elementDescription, level=0, indentation='    '):
+def getIndentedCode(elementDescription, level=0, indentation='    '):
     elementFilename = elementDescription['filename'];
     p = "./code/" + elementFilename
     file = open(p, 'r')
+    s = ""
+    indent = indentation * level
+    for line in file.readlines():
+        s += indent + line
+    file.close()
+    return s
 
 
-def addElement(p, details):
-    content = read(p)
+def addElement(filepath, elementDescription, details):
+    content = read(filepath)
     # print("--- content before ---\n", content)
 
     content_after, level = searchV2(content, details)
@@ -188,25 +193,27 @@ def addElement(p, details):
     print(content_after)
 
     result = content[:position]
-    result += addRowWith2Cols(0)
+    result += getIndentedCode(elementDescription)
     result += content_after
 
     # print("\n--- content after ---\n", result)
 
-    file = open(p, 'w')
+    file = open(filepath, 'w')
     file.write(result)
     file.close()
 
 def insert(data: dict):
     _p = data['path']
     details = data['details']
+    element = data['element']
     print('PATH SENT', _p)
     print('DETAILS', details)
-    if (not _p): return;
+    print('ELEMENT', element)
+    if not _p or not element: return;
 
     p = path_to_app + _p
 
-    addElement(p, details)
+    addElement(p, element, details)
 
 
 if __name__ == "__main__":
