@@ -1,0 +1,3 @@
+# BEGIN add module
+MODULES ReactiveFromsModule FROM @angular/forms
+# END add to module

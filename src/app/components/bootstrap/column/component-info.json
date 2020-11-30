@@ -1,0 +1,11 @@
+{
+    "selector": "bootstrap-column",
+    "inputs": {
+        "smBreakpoint": {
+            "type": "number",
+            "min": 1,
+            "max": 12,
+            "default": 12
+        }
+    }
+}

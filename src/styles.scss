@@ -51,6 +51,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 // .mat-button-focus-overlay {
 //   background-color: transparent !important;
 // }
+button.mat-button-base {
+  margin-bottom: 8px;
+}
 button:focus {
   outline: none;
 }

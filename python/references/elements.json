@@ -7,6 +7,17 @@
     ],
     "__elements__": {
         "bootstrap": {
+            "bootstrap-row": {
+                "dirpath": "src/app/components/bootstrap/row",
+                "name": "Row",
+                "component-name": "bootstrap-row.component.ts",
+                "selector": "bootstrap-row",
+                "module-name": "bootstrap-row.module.ts"
+            },
+            "bootstrap-column": {
+                "dirpath": "src/app/components/bootstrap/column",
+                "name": "Column"
+            },
             "bootstrap-row-2cols": {
                 "filename": "bootstrap-row-2cols.html",
                 "name": "Row with 2 columns"

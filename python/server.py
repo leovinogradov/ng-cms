@@ -21,7 +21,6 @@ def getElements():
     with open('./references/elements.json') as f:
         # contents = f.read()
         data = json.load(f)
-        print(data)
         return jsonify(data)
 
 

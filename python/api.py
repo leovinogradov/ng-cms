@@ -1,6 +1,11 @@
 import re
+import project_parser as parser
+from codeGen import createNgComponent
 
 path_to_app = '../src/app';
+
+elementsToIgnore = ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'router-outlet'];
+
 
 def read(p):
     print("Reading:", p)
@@ -42,14 +47,14 @@ def goThroughNextElement(text):
     # text = text[pos:]
     return text
 
-def searchV2(_text, details, removeNodeContents=True):
+def searchV2(_text, pathDetails, removeNodeContents=True):
     text = _text
     position = 0
-    length = len(details)
+    length = len(pathDetails)
     i = 1
 
     while i < length:
-        d = details[i]
+        d = pathDetails[i]
         childrenToGoThrough = d['index'];
 
         for c in range(childrenToGoThrough):
@@ -112,17 +117,17 @@ def goThroughChildrenIterative(childrenToGoThrough, level, text, position):
                     break
     return (text, position,)
 
-def search(_text, details, removeNodeContents=True):
+def search(_text, pathDetails, removeNodeContents=True):
     #n = re.search('(?<=div)', text);
     #print(n)
     text = _text
     position = 0
-    length = len(details)
+    length = len(pathDetails)
     level = 0
     i = 1
     d = None
     while i < length:
-        d = details[i]
+        d = pathDetails[i]
         print('DETAILS', i, d)
         childrenToGoThrough = d['index'];
 
@@ -181,20 +186,25 @@ def getIndentedCode(elementDescription, level=0, indentation='\t'):
     return s
 
 
-def addElement(filepath, elementDescription, details):
+def addElement(filepath, element, pathDetails):
     content = read(filepath)
     # print("--- content before ---\n", content)
 
-    content_after, level = searchV2(content, details)
+    content_after, indentLevel = searchV2(content, pathDetails)
     position = len(content) - len(content_after)
-    print('Level =', level)
-    print('=== BEFORE === ')
-    print(content[:position])
-    print('\n=== AFTER ===')
-    print(content_after)
+    print('Indent level =', indentLevel)
+    # print('=== BEFORE === ')
+    # print(content[:position])
+    # print('\n=== AFTER ===')
+    # print(content_after)
 
     result = content[:position]
-    result += getIndentedCode(elementDescription, level)
+    
+    # result += getIndentedCode(elementDescription, level)
+    if (element['selector']):
+        result += '\n'
+        result += createNgComponent(element, indentLevel)
+    
     result += content_after
 
     # print("\n--- content after ---\n", result)
@@ -203,24 +213,38 @@ def addElement(filepath, elementDescription, details):
     file.write(result)
     file.close()
 
+
+
 def insert(data: dict):
     _p = data['path']
-    details = data['details']
+    pathDetails = data['descriptivePath']
+    componentSelector = ''
+
+    for i in range(len(pathDetails) - 1, -1, -1):
+        localName = pathDetails[i]['localName']
+        if not localName in elementsToIgnore:
+            print('TEST', localName)
+            componentSelector = localName
+            break
+    
+    
+    filePath = parser.findComponentFile(componentSelector)
+
     element = data['element']
-    print('PATH SENT', _p)
-    print('DETAILS', details)
-    print('ELEMENT', element)
-    if not _p or not element: return;
+    print('\nPATH SENT', _p)
+    print('\nPATH DETAILS', pathDetails)
+    print('\nELEMENT', element)
+    # if not _p or not element: return;
 
     p = path_to_app + _p
 
-    addElement(p, element, details)
+    addElement(p, element, pathDetails)
 
 
 if __name__ == "__main__":
     path = '../src/app/views/hello/hello.component.html'
-    details = [{'localName': 'app-hello', 'className': '', 'index': 0, 'childCount': 1}, {'localName': 'div', 'className': 'container', 'childCount': 3, 'index': 0}, {'localName': 'div', 'className': 'row', 'childCount': 2, 'index': 1, 'parsableChildCount': 2}]
+    pathDetails = [{'localName': 'app-hello', 'className': '', 'index': 0, 'childCount': 1}, {'localName': 'div', 'className': 'container', 'childCount': 3, 'index': 0}, {'localName': 'div', 'className': 'row', 'childCount': 2, 'index': 1, 'parsableChildCount': 2}]
     _text = read(path)
-    text, position, level = search(_text, details)
+    text, position, level = search(_text, pathDetails)
     print(text)
     print(position, level)

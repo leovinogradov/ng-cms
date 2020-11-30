@@ -1,5 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router, RouteConfigLoadEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 // const selectedBorderColor = 'rgb(33, 150, 243)';
 const selectedBorderStyle = '1px solid rgb(33, 150, 243)';
@@ -11,7 +13,7 @@ const selectedBorderStyle = '1px solid rgb(33, 150, 243)';
 })
 export class AppComponent implements OnInit {
   title = 'myapp';
-  appNodeName = 'APP-HELLO';
+  appNodeName = 'APP-ROOT';
   currentTgt: any;
   path: Array<any>;
   indexInPath: number;
@@ -21,11 +23,20 @@ export class AppComponent implements OnInit {
   availableCategories: Array<any>;
   // descriptivePath: Array<any>;
   // elementToInsert: any;
+  elementsToIgnore = ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'router-outlet'];
 
   constructor(
     private http: HttpClient,
-    private ref: ChangeDetectorRef
-  ) {}
+    private ref: ChangeDetectorRef,
+    private router: Router
+  ) {
+    this.router.events.pipe(
+      filter(e => e instanceof RouteConfigLoadEnd)
+    ).subscribe(e => {
+      console.log('TEST', e);
+      console.log(this.router.config);
+    });
+  }
 
   ngOnInit() {
     document.addEventListener("click", this.handleClick.bind(this));
@@ -44,7 +55,7 @@ export class AppComponent implements OnInit {
   }
 
   handleClick(e: any) {
-    console.log(e);
+    // console.log(e);
     
     if (e.target && e.target.localName == 'body') {
       if (this.currentTgt && this.currentTgt.style.border == selectedBorderStyle) {
@@ -52,19 +63,20 @@ export class AppComponent implements OnInit {
       }
       this.root = true;
       this.currentTgt = null;
+      console.log('Target is body');
       return;
     }
 
     if (e.path) {
       const path = e.path;
-      const appNodeName = this.appNodeName;
-      if (!appNodeName) throw Error('No appNodeName');
-      const appIndex = path.findIndex((i: any) => i.nodeName == appNodeName);
-      if (appIndex != -1) {
+      // const appNodeName = this.appNodeName;
+      // if (!appNodeName) throw Error('No appNodeName');
+      const rootIndex = path.findIndex((i: any) => i.id == 'root-container');
+      if (rootIndex != -1) {
         let tgtIndex = path.findIndex((i: any) => i.localName == 'div');
         if (tgtIndex != -1) {
-          if (tgtIndex == appIndex) {
-            console.log('Target index is App index');
+          if (tgtIndex == rootIndex) {
+            console.log('Target index is Root index');
           } else {
             if (this.currentTgt && this.currentTgt.style.border == selectedBorderStyle) {
               this.removeCurrentTgtHighlight();
@@ -75,7 +87,7 @@ export class AppComponent implements OnInit {
             this.root = false;
             this.path = path;
             this.indexInPath = tgtIndex;
-            this.maxIndexInPath = appIndex;
+            this.maxIndexInPath = rootIndex;
             console.log('Found new target', this.currentTgt);
             return;
           }
@@ -105,6 +117,29 @@ export class AppComponent implements OnInit {
       }
     }
   }
+
+  private _parseDocumentTree(element: Element) {
+    let ret = [];
+    for (var i = 0; i < element.children.length; i++) {
+      const child = element.children[i];
+      const localName = child.localName;
+      if (!this.elementsToIgnore.includes(localName)) {
+        ret.push(localName);
+      }
+      ret = ret.concat(this._parseDocumentTree(child));
+    }
+    return ret;
+  }
+
+  parseDocumentTree() {
+    const appRoot = 'app-root';
+    var root = document.getElementsByTagName(appRoot)[0];
+    root = root.getElementsByClassName('root-container')[0];
+
+    const angularElements = this._parseDocumentTree(root);
+    console.log('Angular elements', angularElements);
+  }
+
 
   generateDescriptivePath() {
     let idx = this.maxIndexInPath;
@@ -171,7 +206,7 @@ export class AppComponent implements OnInit {
   addElement(element) {
     console.log('Current target', this.currentTgt);
     console.log('Element to insert', element);
-    if (!element || !element.filename) {
+    if (!element) {
       console.log('Error: No element to insert');
       return;
     }
@@ -179,7 +214,7 @@ export class AppComponent implements OnInit {
     const ob = this.http.post('http://localhost:5000/insert', {
       path: '/views/hello/hello.component.html',
       element: element,
-      details: this.generateDescriptivePath()
+      descriptivePath: this.generateDescriptivePath()
     });
 
     ob.subscribe({

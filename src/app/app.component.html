@@ -6,6 +6,8 @@
   </p>
   </div>
 
+  <button mat-flat-button color="primary" (click)="parseDocumentTree()">Show components</button>
+
   <div *ngFor="let category of availableCategories">
     <button mat-flat-button color="primary" [matMenuTriggerFor]="menu">Add {{ category.prettyName || category.name }} element</button>
     <mat-menu #menu="matMenu">
@@ -33,6 +35,6 @@
     </div>
   </div> -->
 </div>
-<div class="root-container">
+<div id="root-container" class="root-container">
   <router-outlet></router-outlet>
 </div>

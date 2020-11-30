@@ -1,0 +1,22 @@
+{
+    "breakpoints": {
+        "sm": {
+            "_name": "sm and up",
+            "options": {
+                "6": {
+                    "class": {
+                        "append": "col-sm-6"
+                    }
+                },
+                "12": {
+                    "class": {
+                        "append": "col-sm-12"
+                    }
+                }
+            }
+        }
+    },
+    "_variables": {
+        "class": "classList"
+    }
+}
